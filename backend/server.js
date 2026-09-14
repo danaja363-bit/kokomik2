@@ -213,6 +213,8 @@ app.post('/api/bookmarks/:mangaId', auth, (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
