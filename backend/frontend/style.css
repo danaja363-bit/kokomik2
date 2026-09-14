@@ -1,0 +1,367 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0f1115;
+  --bg-2: #181b22;
+  --bg-3: #22262f;
+  --accent: #ff6b35;
+  --accent-2: #ff8c5a;
+  --text: #e8eaed;
+  --text-2: #9aa0a6;
+  --border: #2a2f38;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ============ NAVBAR ============ */
+.navbar {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-wrap: wrap;
+}
+.logo {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+.logo span { color: var(--text); }
+.search-box {
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+  min-width: 200px;
+}
+.search-box input {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+.search-box input:focus { border-color: var(--accent); }
+.nav-actions { display: flex; gap: 8px; margin-left: auto; }
+.btn {
+  padding: 9px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+.btn:hover { background: var(--accent-2); transform: translateY(-1px); }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-outline:hover { background: var(--bg-3); }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-danger { background: #e53935; }
+.btn-danger:hover { background: #ef5350; }
+
+/* ============ CONTAINER ============ */
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ============ FILTERS ============ */
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filters select, .filters input {
+  padding: 8px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+}
+.genre-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 6px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip:hover, .chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* ============ MANGA GRID ============ */
+.manga-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 18px;
+}
+.manga-card {
+  background: var(--bg-2);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s;
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.manga-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(255, 107, 53, 0.15);
+}
+.manga-cover {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  background: var(--bg-3);
+  display: block;
+}
+.manga-info { padding: 10px 12px; }
+.manga-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.manga-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  flex-wrap: wrap;
+}
+.badge {
+  padding: 2px 8px;
+  background: var(--bg-3);
+  border-radius: 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.badge.ongoing { background: #1b5e20; color: #b9f6ca; }
+.badge.completed { background: #0d47a1; color: #bbdefb; }
+
+/* ============ MANGA DETAIL ============ */
+.manga-detail {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+.manga-detail-cover {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  background: var(--bg-3);
+}
+.manga-detail h1 { font-size: 32px; margin-bottom: 8px; line-height: 1.2; }
+.manga-detail .alt-title { color: var(--text-2); margin-bottom: 16px; font-style: italic; }
+.manga-detail .stats {
+  display: flex;
+  gap: 20px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+.stat-item { display: flex; flex-direction: column; }
+.stat-label { font-size: 12px; color: var(--text-2); text-transform: uppercase; }
+.stat-value { font-size: 18px; font-weight: 700; color: var(--accent); }
+.manga-desc {
+  color: var(--text-2);
+  line-height: 1.7;
+  margin: 16px 0;
+}
+.genre-list { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+
+/* ============ CHAPTER LIST ============ */
+.chapter-list { display: flex; flex-direction: column; gap: 8px; }
+.chapter-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--bg-2);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  gap: 14px;
+}
+.chapter-item:hover {
+  background: var(--bg-3);
+  border-left-color: var(--accent);
+  padding-left: 22px;
+}
+.chapter-num { font-weight: 700; color: var(--accent); min-width: 80px; }
+.chapter-title { flex: 1; color: var(--text-2); font-size: 14px; }
+.chapter-date { font-size: 12px; color: var(--text-2); }
+
+/* ============ READER ============ */
+.reader-body { background: #000; }
+.reader-header {
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.reader-header .title {
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reader-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.reader-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 4px;
+}
+.reader-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 24px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 12px;
+}
+.reader-nav button {
+  flex: 1;
+  padding: 14px;
+  background: var(--bg-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.reader-nav button:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: white; }
+.reader-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ============ MODAL ============ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal h2 { margin-bottom: 20px; font-size: 20px; }
+.modal .form-group { margin-bottom: 14px; }
+.modal label { display: block; font-size: 13px; color: var(--text-2); margin-bottom: 6px; }
+.modal input, .modal select, .modal textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+.modal input:focus, .modal textarea:focus { border-color: var(--accent); }
+.modal textarea { min-height: 80px; resize: vertical; }
+.modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-actions button { flex: 1; }
+
+/* ============ LOADING & EMPTY ============ */
+.loading, .empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-2);
+}
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 768px) {
+  .manga-detail { grid-template-columns: 1fr; }
+  .manga-detail-cover { max-width: 200px; margin: 0 auto; }
+  .manga-detail h1 { font-size: 22px; }
+  .container { padding: 16px; }
+  .manga-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+  .navbar { padding: 10px 12px; gap: 10px; }
+  .logo { font-size: 18px; }
+}
