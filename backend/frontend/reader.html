@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baca Manga</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="reader-body">
+
+<div class="reader-header">
+  <a href="javascript:history.back()" class="btn btn-outline btn-sm">← Kembali</a>
+  <div class="title" id="readerTitle">Memuat...</div>
+  <select id="chapterSelector" style="padding:8px 12px; background:var(--bg-3); border:1px solid var(--border); border-radius:6px; color:var(--text)"></select>
+</div>
+
+<div class="reader-content" id="readerContent">
+  <div class="loading"><div class="spinner"></div>Memuat halaman...</div>
+</div>
+
+<div class="reader-nav">
+  <button id="prevBtn">← Sebelumnya</button>
+  <button id="nextBtn">Selanjutnya →</button>
+</div>
+
+<script>
+ const API = '/api';
+const API_BASE = '';
+  const params = new URLSearchParams(location.search);
+  const chapterId = params.get('id');
+
+  let currentChapter = null;
+  let siblingChapters = [];
+
+  async function loadChapter() {
+    const res = await fetch(`${API}/chapters/${chapterId}`);
+    if (!res.ok) {
+      document.getElementById('readerContent').innerHTML = '<div class="empty">Chapter tidak ditemukan</div>';
+      return;
+    }
+    const c = await res.json();
+    currentChapter = c;
+
+    document.title = `${c.manga_title} - Ch. ${c.chapter_number}`;
+    document.getElementById('readerTitle').innerHTML = 
+      `<a href="manga.html?id=${c.manga_id}" style="color:var(--accent); text-decoration:none">${c.manga_title}</a> — Ch. ${c.chapter_number}`;
+
+    // Load manga chapters untuk navigasi
+    const mangaRes = await fetch(`${API}/manga/${c.manga_id}`);
+    const manga = await mangaRes.json();
+    siblingChapters = manga.chapters.sort((a, b) => a.chapter_number - b.chapter_number);
+
+    // Render pages
+    document.getElementById('readerContent').innerHTML = c.pages.map(p => 
+      `<img src="${API_BASE}${p}" loading="lazy" alt="page">`
+    ).join('') || '<div class="empty">Tidak ada halaman</div>';
+
+    // Setup select
+    const sel = document.getElementById('chapterSelector');
+    sel.innerHTML = siblingChapters.map(ch => 
+      `<option value="${ch.id}" ${ch.id == chapterId ? 'selected' : ''}>Ch. ${ch.chapter_number} ${ch.title || ''}</option>`
+    ).join('');
+    sel.onchange = () => location.href = `reader.html?id=${sel.value}`;
+
+    // Navigation
+    const idx = siblingChapters.findIndex(ch => ch.id == chapterId);
+    document.getElementById('prevBtn').disabled = idx <= 0;
+    document.getElementById('nextBtn').disabled = idx >= siblingChapters.length - 1;
+    document.getElementById('prevBtn').onclick = () => {
+      if (idx > 0) location.href = `reader.html?id=${siblingChapters[idx - 1].id}`;
+    };
+    document.getElementById('nextBtn').onclick = () => {
+      if (idx < siblingChapters.length - 1) location.href = `reader.html?id=${siblingChapters[idx + 1].id}`;
+    };
+
+    window.scrollTo(0, 0);
+  }
+
+  loadChapter();
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') document.getElementById('prevBtn').click();
+    if (e.key === 'ArrowRight') document.getElementById('nextBtn').click();
+  });
+</script>
+</body>
+</html>
