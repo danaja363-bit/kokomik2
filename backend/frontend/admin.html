@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - MangaReader</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .admin-tab {
+    padding: 10px 20px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .admin-tab.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .admin-panel { display: none; }
+  .admin-panel.active { display: block; }
+  .table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .table th, .table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .table th { color: var(--text-2); font-weight: 600; text-transform: uppercase; font-size: 12px; }
+  .file-input {
+    width: 100%;
+    padding: 10px;
+    background: var(--bg-3);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">Manga<span>Reader</span></a>
+  <div class="nav-actions">
+    <a href="index.html" class="btn btn-outline">← Beranda</a>
+    <button class="btn btn-outline" onclick="logout()">Keluar</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1 class="page-title">⚙️ Admin Panel</h1>
+
+  <div class="admin-tabs">
+    <div class="admin-tab active" data-tab="manga">📚 Manga</div>
+    <div class="admin-tab" data-tab="chapter">📖 Chapter</div>
+  </div>
+
+  <!-- MANGA TAB -->
+  <div class="admin-panel active" id="panel-manga">
+    <button class="btn" onclick="openMangaModal()">➕ Tambah Manga</button>
+    <table class="table" id="mangaTable">
+      <thead>
+        <tr><th>Cover</th><th>Judul</th><th>Status</th><th>Views</th><th>Aksi</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- CHAPTER TAB -->
+  <div class="admin-panel" id="panel-chapter">
+    <div style="margin-bottom:16px">
+      <label style="display:block; font-size:13px; color:var(--text-2); margin-bottom:6px">Pilih Manga</label>
+      <select id="chapterMangaSelect" style="padding:10px 14px; background:var(--bg-2); border:1px solid var(--border); border-radius:8px; color:var(--text); min-width:250px"></select>
+      <button class="btn" style="margin-left:12px" onclick="openChapterModal()">➕ Tambah Chapter</button>
+    </div>
+    <table class="table" id="chapterTable">
+      <thead>
+        <tr><th>Chapter</th><th>Judul</th><th>Halaman</th><th>Views</th><th>Aksi</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL MANGA -->
+<div class="modal-overlay" id="mangaModal">
+  <div class="modal" style="max-width:600px">
+    <h2 id="mangaModalTitle">Tambah Manga</h2>
+    <input type="hidden" id="mangaId">
+    <div class="form-group">
+      <label>Judul *</label>
+      <input type="text" id="mangaTitle">
+    </div>
+    <div class="form-group">
+      <label>Judul Alternatif</label>
+      <input type="text" id="mangaAltTitle">
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+      <div class="form-group">
+        <label>Author</label>
+        <input type="text" id="mangaAuthor">
+      </div>
+      <div class="form-group">
+        <label>Artist</label>
+        <input type="text" id="mangaArtist">
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="mangaStatus">
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+          <option value="hiatus">Hiatus</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tahun</label>
+        <input type="number" id="mangaYear">
+      </div>
+      <div class="form-group">
+        <label>Rating (0-10)</label>
+        <input type="number" step="0.1" id="mangaRating" value="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Genre (pisahkan dengan koma)</label>
+      <input type="text" id="mangaGenres" placeholder="Action, Romance, Fantasy">
+    </div>
+    <div class="form-group">
+      <label>Deskripsi</label>
+      <textarea id="mangaDesc"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Cover Image</label>
+      <input type="file" id="mangaCover" accept="image/*" class="file-input">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('mangaModal')">Batal</button>
+      <button class="btn" onclick="saveManga()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHAPTER -->
+<div class="modal-overlay" id="chapterModal">
+  <div class="modal">
+    <h2>Tambah Chapter</h2>
+    <div class="form-group">
+      <label>Nomor Chapter *</label>
+      <input type="number" step="0.1" id="chapNumber">
+    </div>
+    <div class="form-group">
+      <label>Judul Chapter (opsional)</label>
+      <input type="text" id="chapTitle">
+    </div>
+    <div class="form-group">
+      <label>Halaman (pilih banyak gambar, urut sesuai nama file)</label>
+      <input type="file" id="chapPages" accept="image/*" multiple class="file-input">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('chapterModal')">Batal</button>
+      <button class="btn" onclick="saveChapter()">Upload</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  const API_BASE = 'http://localhost:3000';
+
+  function getToken() { return localStorage.getItem('token'); }
+  function getUser() {
+    try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
+  }
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    location.href = 'index.html';
+  }
+
+  // Redirect if not admin
+  const user = getUser();
+  if (!user || user.role !== 'admin') {
+    alert('Hanya admin yang bisa akses halaman ini');
+    location.href = 'index.html';
+  }
+
+  // Tab switching
+  document.querySelectorAll('.admin-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active');
+      if (tab.dataset.tab === 'chapter') loadChapters();
+    };
+  });
+
+  function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.onclick = e => { if (e.target === m) m.classList.remove('active'); };
+  });
+
+  // ============ MANGA CRUD ============
+  async function loadMangaList() {
+    const res = await fetch(`${API}/manga?limit=1000`);
+    const list = await res.json();
+    document.querySelector('#mangaTable tbody').innerHTML = list.map(m => `
+      <tr>
+        <td><img src="${m.cover ? API_BASE + m.cover : ''}" style="width:40px; height:55px; object-fit:cover; border-radius:4px; background:#333"></td>
+        <td><b>${m.title}</b><br><small style="color:var(--text-2)">${m.author || '-'}</small></td>
+        <td><span class="badge ${m.status}">${m.status}</span></td>
+        <td>${m.views}</td>
+        <td>
+          <button class="btn btn-sm btn-outline" onclick='editManga(${JSON.stringify(m).replace(/'/g, "&#39;")})'>Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteManga(${m.id})">Hapus</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" class="empty">Belum ada manga</td></tr>';
+
+    // Populate manga select untuk chapter
+    const sel = document.getElementById('chapterMangaSelect');
+    sel.innerHTML = list.map(m => `<option value="${m.id}">${m.title}</option>`).join('');
+    sel.onchange = loadChapters;
+    loadChapters();
+  }
+
+  function openMangaModal() {
+    document.getElementById('mangaModalTitle').textContent = 'Tambah Manga';
+    ['mangaId', 'mangaTitle', 'mangaAltTitle', 'mangaAuthor', 'mangaArtist', 'mangaYear', 'mangaGenres', 'mangaDesc'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('mangaStatus').value = 'ongoing';
+    document.getElementById('mangaRating').value = '0';
+    document.getElementById('mangaCover').value = '';
+    document.getElementById('mangaModal').classList.add('active');
+  }
+
+  function editManga(m) {
+    document.getElementById('mangaModalTitle').textContent = 'Edit Manga';
+    document.getElementById('mangaId').value = m.id;
+    document.getElementById('mangaTitle').value = m.title || '';
+    document.getElementById('mangaAltTitle').value = m.alternative_title || '';
+    document.getElementById('mangaAuthor').value = m.author || '';
+    document.getElementById('mangaArtist').value = m.artist || '';
+    document.getElementById('mangaStatus').value = m.status || 'ongoing';
+    document.getElementById('mangaYear').value = m.year || '';
+    document.getElementById('mangaRating').value = m.rating || 0;
+    document.getElementById('mangaGenres').value = m.genres || '';
+    document.getElementById('mangaDesc').value = m.description || '';
+    document.getElementById('mangaModal').classList.add('active');
+  }
+
+  async function saveManga() {
+    const id = document.getElementById('mangaId').value;
+    const title = document.getElementById('mangaTitle').value.trim();
+    if (!title) return alert('Judul wajib diisi');
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('alternative_title', document.getElementById('mangaAltTitle').value);
+    formData.append('author', document.getElementById('mangaAuthor').value);
+    formData.append('artist', document.getElementById('mangaArtist').value);
+    formData.append('status', document.getElementById('mangaStatus').value);
+    formData.append('year', document.getElementById('mangaYear').value);
+    formData.append('genres', document.getElementById('mangaGenres').value);
+    formData.append('description', document.getElementById('mangaDesc').value);
+    const coverFile = document.getElementById('mangaCover').files[0];
+    if (coverFile) formData.append('cover', coverFile);
+
+    let url = `${API}/manga`;
+    let method = 'POST';
+
+    if (id) {
+      // Update metadata dulu
+      await fetch(`${API}/manga/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        body: JSON.stringify({
+          title,
+          alternative_title: document.getElementById('mangaAltTitle').value,
+          author: document.getElementById('mangaAuthor').value,
+          artist: document.getElementById('mangaArtist').value,
+          status: document.getElementById('mangaStatus').value,
+          year: document.getElementById('mangaYear').value,
+          genres: document.getElementById('mangaGenres').value,
+          description: document.getElementById('mangaDesc').value
+        })
+      });
+
+      // Upload cover kalau ada
+      if (coverFile) {
+        const coverData = new FormData();
+        coverData.append('cover', coverFile);
+        await fetch(`${API}/manga/${id}/cover`, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + getToken() },
+          body: coverData
+        });
+      }
+      alert('Manga diupdate');
+    } else {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Authorization': 'Bearer ' + getToken() },
+        body: formData
+      });
+      if (!res.ok) return alert('Gagal menyimpan');
+      alert('Manga ditambahkan');
+    }
+
+    closeModal('mangaModal');
+    loadMangaList();
+  }
+
+  async function deleteManga(id) {
+    if (!confirm('Yakin hapus manga ini? Semua chapter akan terhapus.')) return;
+    await fetch(`${API}/manga/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    });
+    loadMangaList();
+  }
+
+  // ============ CHAPTER ============
+  async function loadChapters() {
+    const mangaId = document.getElementById('chapterMangaSelect').value;
+    if (!mangaId) {
+      document.querySelector('#chapterTable tbody').innerHTML = '<tr><td colspan="5" class="empty">Pilih manga</td></tr>';
+      return;
+    }
+    const res = await fetch(`${API}/manga/${mangaId}`);
+    const m = await res.json();
+    document.querySelector('#chapterTable tbody').innerHTML = m.chapters.map(c => `
+      <tr>
+        <td><b>Ch. ${c.chapter_number}</b></td>
+        <td>${c.title || '-'}</td>
+        <td>-</td>
+        <td>${c.views}</td>
+        <td>
+          <button class="btn btn-sm btn-outline" onclick="location.href='reader.html?id=${c.id}'">Lihat</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteChapter(${c.id})">Hapus</button>
+        </td>
+      </tr>
+    `).join('') || '<tr><td colspan="5" class="empty">Belum ada chapter</td></tr>';
+  }
+
+  function openChapterModal() {
+    const mangaId = document.getElementById('chapterMangaSelect').value;
+    if (!mangaId) return alert('Pilih manga dulu');
+    document.getElementById('chapNumber').value = '';
+    document.getElementById('chapTitle').value = '';
+    document.getElementById('chapPages').value = '';
+    document.getElementById('chapterModal').classList.add('active');
+  }
+
+  async function saveChapter() {
+    const mangaId = document.getElementById('chapterMangaSelect').value;
+    const number = document.getElementById('chapNumber').value;
+    const title = document.getElementById('chapTitle').value;
+    const files = document.getElementById('chapPages').files;
+    if (!number) return alert('Nomor chapter wajib');
+    if (!files.length) return alert('Pilih minimal 1 halaman');
+
+    const formData = new FormData();
+    formData.append('chapter_number', number);
+    formData.append('title', title);
+    for (const f of files) formData.append('pages', f);
+
+    const res = await fetch(`${API}/manga/${mangaId}/chapters`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + getToken() },
+      body: formData
+    });
+    if (!res.ok) return alert('Gagal upload chapter');
+    alert('Chapter berhasil diupload!');
+    closeModal('chapterModal');
+    loadChapters();
+  }
+
+  async function deleteChapter(id) {
+    if (!confirm('Hapus chapter ini?')) return;
+    await fetch(`${API}/chapters/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    });
+    loadChapters();
+  }
+
+  loadMangaList();
+</script>
+</body>
+</html>
