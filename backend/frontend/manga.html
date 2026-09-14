@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detail Manga</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">Manga<span>Reader</span></a>
+  <div class="nav-actions">
+    <a href="index.html" class="btn btn-outline">← Beranda</a>
+  </div>
+</nav>
+
+<div class="container" id="detailContainer">
+  <div class="loading"><div class="spinner"></div>Memuat...</div>
+</div>
+
+<script>
+const API = '/api';
+const API_BASE = '';
+  const params = new URLSearchParams(location.search);
+  const mangaId = params.get('id');
+
+  function getToken() { return localStorage.getItem('token'); }
+
+  async function loadDetail() {
+    if (!mangaId) {
+      document.getElementById('detailContainer').innerHTML = '<div class="empty">Manga tidak ditemukan</div>';
+      return;
+    }
+    const res = await fetch(`${API}/manga/${mangaId}`);
+    if (!res.ok) {
+      document.getElementById('detailContainer').innerHTML = '<div class="empty">Manga tidak ditemukan</div>';
+      return;
+    }
+    const m = await res.json();
+    document.title = `${m.title} - MangaReader`;
+
+    const genres = (m.genres || '').split(',').map(g => g.trim()).filter(Boolean);
+
+    document.getElementById('detailContainer').innerHTML = `
+      <div class="manga-detail">
+        <div>
+          <img class="manga-detail-cover" 
+               src="${m.cover ? API_BASE + m.cover : 'data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 400%22><rect fill=%22%23222%22 width=%22300%22 height=%22400%22/></svg>'}">
+        </div>
+        <div>
+          <h1>${m.title}</h1>
+          ${m.alternative_title ? `<div class="alt-title">${m.alternative_title}</div>` : ''}
+          <div class="stats">
+            <div class="stat-item">
+              <span class="stat-label">Status</span>
+              <span class="stat-value" style="text-transform:capitalize">${m.status}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Views</span>
+              <span class="stat-value">${m.views.toLocaleString()}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Rating</span>
+              <span class="stat-value">⭐ ${(m.rating || 0).toFixed(1)}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Chapter</span>
+              <span class="stat-value">${m.chapters.length}</span>
+            </div>
+          </div>
+          ${m.author ? `<p style="margin-top:8px"><b>Author:</b> ${m.author}</p>` : ''}
+          ${m.artist ? `<p><b>Artist:</b> ${m.artist}</p>` : ''}
+          ${m.year ? `<p><b>Tahun:</b> ${m.year}</p>` : ''}
+          <div class="genre-list">
+            ${genres.map(g => `<span class="chip">${g}</span>`).join('')}
+          </div>
+          <div class="manga-desc">${m.description || 'Tidak ada deskripsi.'}</div>
+        </div>
+      </div>
+
+      <h2 class="page-title">📖 Daftar Chapter</h2>
+      <div class="chapter-list" id="chapterList">
+        ${m.chapters.length === 0 ? '<div class="empty">Belum ada chapter</div>' : 
+          m.chapters.map(c => `
+            <a class="chapter-item" href="reader.html?id=${c.id}">
+              <span class="chapter-num">Ch. ${c.chapter_number}</span>
+              <span class="chapter-title">${c.title || ''}</span>
+              <span class="chapter-date">${new Date(c.created_at).toLocaleDateString('id-ID')}</span>
+            </a>
+          `).join('')
+        }
+      </div>
+    `;
+  }
+
+  loadDetail();
+</script>
+</body>
+</html>
